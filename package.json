@@ -1,0 +1,24 @@
+{
+  "name": "blogerbrt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev:build": "nodemon -e mjs,html,md,scss --ignore build/ build.mjs",
+    "dev:server": "node dev-server.mjs",
+    "dev": "concurrently \"npm:dev:*\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "date-fns": "^2.28.0",
+    "markdown-it": "^12.3.2",
+    "markdown-it-front-matter": "^0.2.3",
+    "node-sass": "^7.0.1",
+    "nodemon": "^2.0.15",
+    "normalize.css": "^8.0.1",
+    "rimraf": "^3.0.2",
+    "concurrently": "^7.0.0"
+  }
+}
