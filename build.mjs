@@ -22,27 +22,27 @@ const build = () => {
   const postsFiles = fs.readdirSync('./posts');
   for (const postFile of postsFiles) {
     const postMd = fs.readFileSync(`./posts/${postFile}`, 'utf8');
-    const { markdown, frontMatter } = parseFrontMatter(postMd);
+    const {markdown, frontMatter} = parseFrontMatter(postMd);
     const postHtml = md.render(markdown);
 
     if (!frontMatter.published) continue;
 
     const postSlug = postFile.replace('.md', '');
-    const title = `${frontMatter.title} | ${defaultTitle}`
+    const title = `${frontMatter.title} | ${defaultTitle}`;
 
     const post = templateHtml
       .replace('{{content}}', `
-      <article>
-        <h1 class="post-title">{{post-title}}</h1>
-        <p class="post-info">
-          <span>
-            Published on
-            <time dateTime="{{date-raw}}" itemProp="datePublished">{{date}}</time>
-          </span>
-        </p>
-        {{content}}
-      </article>
-    `)
+        <article>
+          <h1 class="post-title">{{post-title}}</h1>
+          <p class="post-info">
+            <span>
+              Published on
+              <time dateTime="{{date-raw}}" itemProp="datePublished">{{date}}</time>
+            </span>
+          </p>
+          {{content}}
+        </article>
+      `)
       .replace('{{content}}', postHtml)
       .replaceAll('{{title}}', title)
       .replace('{{post-title}}', frontMatter.title)
@@ -51,7 +51,7 @@ const build = () => {
       .replaceAll('{{description}}', frontMatter.description);
 
     fs.mkdirSync(`./build/${postSlug}`);
-    fs.writeFileSync(`./build/${postSlug}/index.html`, minifyHtml(post))
+    fs.writeFileSync(`./build/${postSlug}/index.html`, minifyHtml(post));
 
     posts.push({
       href: `/${postSlug}`,
@@ -95,7 +95,7 @@ const build = () => {
     }
 
     fs.mkdirSync(`./build/${pageSlug}`);
-    fs.writeFileSync(`./build/${pageSlug}/index.html`, minifyHtml(page))
+    fs.writeFileSync(`./build/${pageSlug}/index.html`, minifyHtml(page));
   }
 
   console.log('Building styles...');
@@ -116,4 +116,4 @@ const build = () => {
 
 build();
 
-export default build
+export default build;

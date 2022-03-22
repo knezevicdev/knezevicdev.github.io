@@ -10,13 +10,16 @@ const parseFrontMatter = (content) => {
   const [fm] = content.match(YAMLFrontMatter);
   const frontMatter = {};
 
-  fm.replaceAll('---', '').trim().split('\n').map(keyValue => {
-    let [key, value] = keyValue.split(':');
-    value = value.trim();
-    if (formatter[key]) value = formatter[key](value);
+  fm.replaceAll('---', '')
+    .trim()
+    .split('\n')
+    .map(keyValue => {
+      let [key, value] = keyValue.split(':');
+      value = value.trim();
+      if (formatter[key]) value = formatter[key](value);
 
-    frontMatter[key] = value;
-  });
+      frontMatter[key] = value;
+    });
 
   return {
     markdown,
@@ -24,4 +27,4 @@ const parseFrontMatter = (content) => {
   }
 }
 
-export default parseFrontMatter
+export default parseFrontMatter;

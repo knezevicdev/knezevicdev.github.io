@@ -19,4 +19,4 @@ const formatDate = (dateString) => {
   return `${date.getDate()} ${month[date.getMonth()]}, ${date.getFullYear()}`;
 }
 
-export default formatDate
+export default formatDate;
