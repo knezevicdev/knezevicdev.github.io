@@ -1,5 +1,10 @@
 import fs from "fs";
 import http from "http";
+import build from "./build.mjs";
+
+fs.watch('./posts', (eventType, filename) => {
+  build();
+});
 
 http.createServer((req, res) => {
   let path = './build' + req.url;
