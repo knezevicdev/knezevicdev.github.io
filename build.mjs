@@ -1,36 +1,18 @@
 import MarkdownIt from 'markdown-it';
-import MarkdownItFrontMatter from 'markdown-it-front-matter';
 import sass from 'node-sass';
 import fs from 'fs';
-import formatDate from "./util/formatDate.mjs";
-import copyFiles from "./util/copyFiles.mjs";
-import minifyHtml from "./util/minifyHtml.mjs";
+import formatDate from './util/formatDate.mjs';
+import copyFiles from './util/copyFiles.mjs';
+import minifyHtml from './util/minifyHtml.mjs';
+import parseFrontMatter from './util/parseFrontMatter.mjs';
 
 const defaultTitle = 'knezevicdev';
 const defaultDescription = 'Software Engineering at its worst.';
 
-const formatter = {
-  published: (val) => val === 'true',
-  tags: (val) => val.split(',').map(tag => tag.trim())
-}
-
-let postMeta = {};
-
 const md = new MarkdownIt();
-md.use(MarkdownItFrontMatter, (fm) => {
-  postMeta = {};
-
-  fm.split('\n').map(keyValue => {
-    let [key, value] = keyValue.split(':');
-    value = value.trim();
-    if (formatter[key]) value = formatter[key](value);
-
-    postMeta[key] = value;
-  });
-});
 
 const build = () => {
-  fs.rmSync('./build', { recursive: true, force: true });
+  fs.rmSync('./build', {recursive: true, force: true});
   fs.mkdirSync('./build');
 
   const templateHtml = fs.readFileSync('./template.html', 'utf8');
@@ -40,12 +22,13 @@ const build = () => {
   const postsFiles = fs.readdirSync('./posts');
   for (const postFile of postsFiles) {
     const postMd = fs.readFileSync(`./posts/${postFile}`, 'utf8');
-    const postHtml = md.render(postMd);
+    const { markdown, frontMatter } = parseFrontMatter(postMd);
+    const postHtml = md.render(markdown);
 
-    if (!postMeta.published) continue;
+    if (!frontMatter.published) continue;
 
     const postSlug = postFile.replace('.md', '');
-    const title = `${postMeta.title} | ${defaultTitle}`
+    const title = `${frontMatter.title} | ${defaultTitle}`
 
     const post = templateHtml
       .replace('{{content}}', `
@@ -62,19 +45,19 @@ const build = () => {
     `)
       .replace('{{content}}', postHtml)
       .replaceAll('{{title}}', title)
-      .replace('{{post-title}}', postMeta.title)
-      .replace('{{date-raw}}', postMeta.date)
-      .replace('{{date}}', formatDate(postMeta.date))
-      .replaceAll('{{description}}', postMeta.description);
+      .replace('{{post-title}}', frontMatter.title)
+      .replace('{{date-raw}}', frontMatter.date)
+      .replace('{{date}}', formatDate(frontMatter.date))
+      .replaceAll('{{description}}', frontMatter.description);
 
     fs.mkdirSync(`./build/${postSlug}`);
     fs.writeFileSync(`./build/${postSlug}/index.html`, minifyHtml(post))
 
     posts.push({
       href: `/${postSlug}`,
-      title: postMeta.title,
-      date: postMeta.date,
-      description: postMeta.description
+      title: frontMatter.title,
+      date: frontMatter.date,
+      description: frontMatter.description
     });
   }
 
@@ -119,13 +102,9 @@ const build = () => {
   const result = sass.renderSync({
     file: './style.scss',
     outputStyle: 'compressed',
-    importer: (url, prev, done) => {
-      const contents = fs.readFileSync(url.replace('~', './node_modules/'), 'utf8');
-
-      return {
-        contents
-      }
-    }
+    importer: (url, prev, done) => ({
+      contents: fs.readFileSync(url, 'utf8')
+    })
   });
   fs.writeFileSync('./build/style.css', result.css);
 

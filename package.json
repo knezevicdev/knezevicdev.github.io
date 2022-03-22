@@ -9,7 +9,6 @@
   "license": "ISC",
   "devDependencies": {
     "markdown-it": "^12.3.2",
-    "markdown-it-front-matter": "^0.2.3",
     "node-sass": "^7.0.1"
   }
 }
